@@ -19,7 +19,7 @@ Mat Character;
 //Mat end_img;//结束模板
 //Mat dst_end;//结束匹配结果图片
 
-int num = 50;//跳的次数
+int num = 500;//跳的次数
 //float res_end;
 int main()
 {
@@ -96,11 +96,15 @@ int get_distance(Point& first_point, Point& next_point)
 void jump(int&g_distance)
 {
 	char AA[50];
-	int distance_ = g_distance * 1.25;
+	int distance_ = g_distance * 1.35;
+	if (distance_ > 1000)
+		distance_ = 300;
+
 	int rand_x = int(320 + rand() % 50); //加上随机数使得每次按压都是在点（320,410）-（370,460）之间
 	int rand_y = int(410 + rand() % 50);
 	sprintf_s(AA, "adb shell input swipe %d %d %d %d %d", rand_x, rand_y, rand_x, rand_y, distance_);
-	cout << AA << endl;
+	//cout << AA << endl;
+	cout << distance_ << endl<<endl;
 	system(AA);
 }
 
@@ -109,15 +113,15 @@ Point GetNextPoint(Mat& srcImage)
 	Point point1;
 	Point point2;
 	cvtColor(srcImage, srcImage, CV_BGR2GRAY);
-	GaussianBlur(srcImage, srcImage,Size(5, 5), 0);  //高斯滤波，降低噪声
-	Canny(srcImage, srcImage, 5, 8);//Canny(srcImage, srcImage, 20, 30);      //进行边缘检测
+	GaussianBlur(srcImage, srcImage,Size(3, 3), 0);  //高斯滤波，降低噪声
+	Canny(srcImage, srcImage, 10, 15);//Canny(srcImage, srcImage, 20, 30);      //进行边缘检测
 	vector<vector<Point>> contours;
 	vector<Vec4i> hierarchy;
 	findContours(srcImage, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point()); //找到关键的角点
 																								//遍历每一个轮廓，把多余的轮廓去掉
 	vector<vector<Point> >::const_iterator it = contours.begin();
 	while (it != contours.end()) {
-		if (it->size()<150)
+		if (it->size()<175)//150
 			it = contours.erase(it);
 		else
 			++it;
